@@ -1,0 +1,57 @@
+task 1 commands
+
+# Create image from dockerfile
+# docker build -t alchikinov/postgres-with-init . -f Dockerfile-postgres
+
+# Run container from newly created image
+# docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword alchikinov/postgres-with-init
+
+# Inspect that conteiner and get ip address
+# docker inspect postgres
+# get IPAddess: 172.17.0.2
+
+# Run different container from originat postgrase image to get access to tables
+# not convinient way, just check that it is work
+# docker run -it --rm postgres psql -h 172.17.0.2 -U postgres
+# - enter the password: mysecretpassword
+# \dt
+# to quit \q
+
+# Working with networks. Stop working container, view network list, add new network
+# docker network list
+# docker ps <- to get container name
+# docker rm -f a20082c6d576
+
+# Creating bridge network
+# docker network create postgres-network
+# docker run --name postgres-db -e POSTGRES_PASSWORD=mysecretpassword --network postgres-network alchikinov/postgres-with-init
+# docker inspect postgres-network <- to check getway
+# docker inspect postgres-db <- to get IP
+
+# get by IP
+# docker run -it --rm --network postgres-network postgres psql -h 172.18.0.2 -U postgres
+
+# get by name
+# docker run -it --rm --network postgres-network postgres psql -h postgres-db -U postgres
+
+# access from local terminal with port
+# to run with port
+# docker run --name postgres-db -e POSTGRES_PASSWORD=mysecretpassword --network postgres-network -p 3000:5432 alchikinov/postgres-with-init
+
+# to access from local terminal
+# psql -h localhost -U postgres-db -p 3000
+
+# network host
+# docker run -it --rm --network host  postgres psql -h localhost -U postgres-db -p 3000
+
+# network none
+# docker run --name postgres-db -e POSTGRES_PASSWORD=mysecretpassword --network none alchikinov/postgres-with-init
+
+# to get files from isolated container
+# docker exec [conteiner id] ls
+
+task 2 (3) commands
+# docker build -t alchikinov/webapp-backend .
+# docker run --rm --name webapp-backend -p 5001:5050 alchikinov/webapp-backend
+
+

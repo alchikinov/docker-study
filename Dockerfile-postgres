@@ -1,0 +1,2 @@
+FROM postgres:18-alpine
+COPY init_script.sql /docker-entrypoint-initdb.d/init_script.sql
