@@ -1,0 +1,41 @@
+services:
+  postgres-db:
+    image: postgres:18-alpine
+    container_name: postgres-db
+    volumes:
+      - ./webapp/backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=mydatabase
+  backend:
+    build: ./webapp/backend
+    image: alchikinov/webapp-backend:latest
+    container_name: backend
+    ports:
+      - 5050:5050
+    deploy:
+      resources:
+        limits:
+          memory: 30M
+          cpus: 0.5
+        reservations:
+          memory: 15M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 10s
+    depends_on:
+      - postgres-db
+  api-tests:
+    build:
+      context: ./api-tests
+      dockerfile: Dockerfile-runner
+    image: alchikinov/api-tests-runner:latest
+    container_name: api-tests
+    # command: cucumber PLATFORM=LOCAL
+    command:  sh -c "sleep 10 && cucumber PLATFORM=LOCAL"
+    depends_on:
+      - backend
+

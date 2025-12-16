@@ -1,0 +1,4 @@
+FROM alchikinov/api-tests-base
+
+COPY features features
+COPY smoke_tests.sh ./

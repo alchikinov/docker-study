@@ -50,8 +50,61 @@ task 1 commands
 # to get files from isolated container
 # docker exec [conteiner id] ls
 
+
 task 2 (3) commands
+# Create network -> webapp-backend
+# docker network create webapp-backend
+
+# Build backend from Dockerfile
 # docker build -t alchikinov/webapp-backend .
-# docker run --rm --name webapp-backend -p 5001:5050 alchikinov/webapp-backend
+
+# Run container 
+# docker run --rm --name webapp-backend --network webapp-network -p 5001:5050 alchikinov/webapp-backend
+
+# Run container from postgres original image
+# docker run --name postgres-db --network webapp-network --rm -v $PWD/init.sql:/docker-entrypoint-initdb.d/init.sql -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_DB=mydatabase postgres
+
+# check FE http://localhost:5001/api/data
+
+task 4
+
+# docker build -t alchikinov/webapp-frontend .
+# docker run --rm --name webapp-frontend --network webapp-network -p 3000:3000 alchikinov/webapp-frontend
+# docker run --rm --name webapp-backend --network webapp-network -p 5050:5050 alchikinov/webapp-backend
+
+# multi stage run
+# docker build -t alchikinov/webapp-frontend-multi-stage .
+# docker run --rm --name webapp-frontend-multi-stage -p 3001:80 alchikinov/webapp-frontend-multi-stage
+
+task 5
+# docker build -t alchikinov/api-tests-base . -f Dockerfile-base
+
+# docker run -it --rm alchikinov/api-tests-base sh
+# ls
+# pwd
+
+task 6
+# docker build -t alchikinov/api-tests-runner . -f Dockerfile-runner
+
+# docker run -it --rm alchikinov/api-tests-runner sh
+# to run test
+# cucumber PLATFORM=DEV
+
+# docker run --rm alchikinov/api-tests-runner cucumber PLATFORM=DEV
+# docker run --rm --network host alchikinov/api-tests-runner cucumber PLATFORM=PRD
+
+# push to docker hub
+# docker tag webapp-frontend:latest alchikinov/webapp-frontend
+# docker push alchikinov/webapp-frontend
 
 
+# docker compose up
+# docker stats
+# docker compose down
+
+# if container failing, do inspect to see reasone and additional information (RestartCount)
+# docker inspect [container]
+
+# docker compose up --build --no-deps api-tests
+# docker compose up --build
+# docker logs [container]
