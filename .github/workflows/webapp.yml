@@ -25,9 +25,9 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
       - name: Build Frontend Docker Image
-        run: docker build -t lchikinov/webapp-frontend-multi-stage ./webapp/frontend  
+        run: docker build -t alchikinov/webapp-frontend-multi-stage ./webapp/frontend  
       - name: Pushing Docker Image to Docker Hub
-        run: docker push lchikinov/webapp-frontend-multi-stage
+        run: docker push alchikinov/webapp-frontend-multi-stage
   
   deploy-backened-dev:
     name: Delploy Backend to Kubernetes DEV
