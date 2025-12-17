@@ -108,3 +108,36 @@ task 6
 # docker compose up --build --no-deps api-tests
 # docker compose up --build
 # docker logs [container]
+
+#kuberketes
+# minikube start
+# minikube tunnel
+# docker stats
+
+# minikube dashboard
+
+
+kubectl get pods
+kubectl get deployments
+kubestk get 
+
+#kubectl create -f [path to the yml file]
+
+# kubectl create -f k8s/database/deployments.yml
+
+# kubectl delete deployment [deployment name]
+# kubectl applay -f [path to the yml file]
+
+# kubectl get services
+
+# kubectl logs [pod name]
+# kubectl exec -it [pod name] -- sh
+
+# kubectl replace --force -f k8s/backend/deployment.yml
+
+# sudo lsof -i -P | grep LISTEN | grep :$PORT
+# docker build -t mtararujs/webapp-frontend:v3 .
+# kubectl set image deployment frontend-deployment-dev frontend-dev=alchikinov/webapp-frontend-multi-stage:v3
+
+
+ 
