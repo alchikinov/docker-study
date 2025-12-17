@@ -18,10 +18,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Backend Docker Image
-        run: docker build -t alchikinov/webapp-backend ./webapp/backend  
-      - name: Pushing Docker Image to Docker Hub
-        run: docker push alchikinov/webapp-backend
+      - uses: ./.github/actions/build
+        with:
+          application: backend
+          docker_image_tag: alchikinov/webapp-backend
+          # - name: Build Backend Docker Image
+      #   run: docker build -t alchikinov/webapp-backend ./webapp/backend  
+      # - name: Pushing Docker Image to Docker Hub
+      #   run: docker push alchikinov/webapp-backend
 
   build-frontend:
     name: Build Frontend
@@ -34,10 +38,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Frontend Docker Image
-        run: docker build -t alchikinov/webapp-frontend-multi-stage ./webapp/frontend  
-      - name: Pushing Docker Image to Docker Hub
-        run: docker push alchikinov/webapp-frontend-multi-stage
+      - uses: ./.github/actions/build
+        with:
+          application: backend
+          docker_image_tag: alchikinov/webapp-frontend-multi-stage
+          # - name: Build Frontend Docker Image
+      #   run: docker build -t alchikinov/webapp-frontend-multi-stage ./webapp/frontend  
+      # - name: Pushing Docker Image to Docker Hub
+      #   run: docker push alchikinov/webapp-frontend-multi-stage
   
   deploy-backened-dev:
     name: Delploy Backend to Kubernetes DEV
