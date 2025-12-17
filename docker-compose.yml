@@ -54,7 +54,9 @@ services:
     #     condition: service_healthy  
 
     # option with wait script
+    # script inserted into api-tests Docker base file
     environment:
       - WAIT_HOSTS=postgres-db:5432,backend:5050
     command:  sh -c "/wait && cucumber PLATFORM=LOCAL"
-
+    depends_on:
+      - backend
