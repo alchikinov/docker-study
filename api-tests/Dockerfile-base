@@ -6,3 +6,5 @@ COPY Gemfile ./
 RUN apt update && apt install -y ruby-dev libffi-dev autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev libmysqlclient-dev
 RUN gem install bundler
 RUN bundle install
+
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait

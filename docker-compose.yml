@@ -13,6 +13,13 @@ services:
     build: ./webapp/backend
     image: alchikinov/webapp-backend:latest
     container_name: backend
+    # health check option
+    # healthcheck:
+      # test: ["CMD-SHELL", "curl -f localhost:5050/api/data"]
+      # interval: 10s
+      # timeout: 2s
+      # retries: 5
+      # start_period: 10s
     ports:
       - 5050:5050
     deploy:
@@ -34,8 +41,20 @@ services:
       dockerfile: Dockerfile-runner
     image: alchikinov/api-tests-runner:latest
     container_name: api-tests
+
+    # hardcoded option, bad example
+    # command:  sh -c "sleep 10 && cucumber PLATFORM=LOCAL"
+    # depends_on:
+      # - backend
+
+    # option with health check for backend service
     # command: cucumber PLATFORM=LOCAL
-    command:  sh -c "sleep 10 && cucumber PLATFORM=LOCAL"
-    depends_on:
-      - backend
+    # depends_on:
+    #   backend:
+    #     condition: service_healthy  
+
+    # option with wait script
+    environment:
+      - WAIT_HOSTS=postgres-db:5432,backend:5050
+    command:  sh -c "/wait && cucumber PLATFORM=LOCAL"
 
