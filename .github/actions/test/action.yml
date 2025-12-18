@@ -2,7 +2,7 @@ name: 'Run API Tests'
 description: '...'
 inputs:
   test_environment:
-    descrption: '..'
+    description: '..'
     required: true
 runs:
   using: "composite"

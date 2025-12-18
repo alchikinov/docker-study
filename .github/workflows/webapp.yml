@@ -23,6 +23,8 @@ jobs:
         if: steps.filter.outputs.backend == 'true'
         uses: ./.github/actions/build
         with:
+          dockerhub_user: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
           application: backend
           docker_image_tag: alchikinov/webapp-backend:$GITHUB_SHA
   build-frontend:
@@ -41,6 +43,8 @@ jobs:
         if: steps.filter.outputs.frontend == 'true'
         uses: ./.github/actions/build
         with:
+          dockerhub_user: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
           application: frontend
           docker_image_tag: alchikinov/webapp-frontend-multi-stage:$GITHUB_SHA
 
