@@ -19,101 +19,76 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
-      - name: Log in to Docker Hub & Build Backend application
-        if: steps.filter.outputs.backend = 'true'
-        uses: docker/login-action@v3
+      - name: Build Backend application
+        if: steps.filter.outputs.backend == 'true'
+        uses: ./.github/actions/build
         with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: ./.github/actions/build
-        with:
-            application: backend
-            docker_image_tag: alchikinov/webapp-backend
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # - uses: ./.github/actions/build
-      #   with:
-      #     application: backend
-      #     docker_image_tag: alchikinov/webapp-backend
-          # - name: Build Backend Docker Image
-      #   run: docker build -t alchikinov/webapp-backend ./webapp/backend  
-      # - name: Pushing Docker Image to Docker Hub
-      #   run: docker push alchikinov/webapp-backend
-
+          application: backend
+          docker_image_tag: alchikinov/webapp-backend:$GITHUB_SHA
   build-frontend:
     name: Build Frontend
     runs-on: self-hosted
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: ./.github/actions/build
+          filters: |
+            frontend:
+              - 'frontend/**'
+      - name: Build Frontend application
+        if: steps.filter.outputs.frontend == 'true'
+        uses: ./.github/actions/build
         with:
-          application: backend
-          docker_image_tag: alchikinov/webapp-frontend-multi-stage
-          # - name: Build Frontend Docker Image
-      #   run: docker build -t alchikinov/webapp-frontend-multi-stage ./webapp/frontend  
-      # - name: Pushing Docker Image to Docker Hub
-      #   run: docker push alchikinov/webapp-frontend-multi-stage
-  
-  deploy-backened-dev:
-    name: Delploy Backend to Kubernetes DEV
+          application: frontend
+          docker_image_tag: alchikinov/webapp-frontend-multi-stage:$GITHUB_SHA
+
+  deploy-dev:
+    name: Deploy Kubuernetes - DEV
     runs-on: self-hosted
-    needs: [build-backend]
+    needs: [build-backend, build-frontend]
     steps:
-      - run: echo "Deploying Backend.."
-  deploy-frontend-dev:
-    name: Delploy Frontend to Kubernetes DEV
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+      - name: Deploy Frontend
+        if: steps.filter.outputs.frontend == 'true'
+        uses: ./.github/actions/deploy
+        with:
+          deployment_name: frontend-deployment-dev
+          deployment_pod_name: frontend-dev
+          docker_image_tag: alchikinov/webapp-frontend-multi-stage:$GITHUB_SHA
+      - name : Deploy Backend
+        if: steps.filter.outputs.backend == 'true'
+        uses: ./.github/actions/deploy
+        with:
+          deployment_name: backend-deployment-dev
+          deployment_pod_name: backend-dev
+          docker_image_tag: alchikinov/webapp-backend:$GITHUB_SHA
+
+  test-dev:
+    name: Run API Tests - DEV
     runs-on: self-hosted
-    needs: [build-frontend]
+    needs: [deploy-dev]
     steps:
-      - run: echo "Deploying Frontend.."
-  test-backend-dev:
-    name: Run API Tests against DEV Backend
-    runs-on: self-hosted
-    needs: [deploy-backened-dev]
-    steps:
-      - run: echo "Running tests.."
-  deploy-backened-stg:
-    name: Delploy Backend to Kubernetes STG
-    runs-on: self-hosted
-    needs: [test-backend-dev]
-    steps:
-      - run: echo "Deploying Backend.."
-  deploy-frontend-stg:
-    name: Delploy Frontend to Kubernetes STG
-    runs-on: self-hosted
-    needs: [deploy-frontend-dev]
-    steps:
-      - run: echo "Deploying Frontend.."
-  test-backend-stg:
-    name: Run API Tests against PRD Backend
-    runs-on: self-hosted
-    needs: [deploy-backened-stg]
-    steps:
-      - run: echo "Running tests.."
-  deploy-backened-prd:
-    name: Delploy Backend to Kubernetes PRD
-    runs-on: self-hosted
-    needs: [test-backend-stg]
-    steps:
-      - run: echo "Deploying Backend.."
-  deploy-frontend-prd:
-    name: Delploy Frontend to Kubernetes PRD
-    runs-on: self-hosted
-    needs: [deploy-frontend-stg]
-    steps:
-      - run: echo "Deploying Frontend.."
-  test-backend-prd:
-    name: Run API Tests against PRD Backend
-    runs-on: self-hosted
-    needs: [deploy-backened-prd]
-    steps:
-      - run: echo "Running tests.."
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+      - name: Run API Tests
+        if: steps.filter.outputs.backend == 'true'
+        uses: ./.github/actions/test
+        with:
+          test_environment: DEV

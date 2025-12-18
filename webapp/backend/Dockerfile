@@ -8,6 +8,7 @@ COPY .env ./
 RUN npm install
 RUN apk add curl
 
+
 EXPOSE 5050
 
 # option to start (launch commang)
